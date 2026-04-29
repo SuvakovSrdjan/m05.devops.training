@@ -51,9 +51,13 @@ blocks:
       jobs:
         - name: Run Unit Tests
           commands:
-            - checkout
+            - kubectl config set-context --current --namespace="g1"
             - kubectl get svc flask-app
-      epilogue:
-        always:
-          commands:
-            - test-results publish unit-tests.xml
+after_pipeline:
+  task:
+    jobs:
+      - name: 'Job #1'
+        commands: []
+promotions:
+  - name: Promotion 1
+    pipeline_file: pipeline_2.yml

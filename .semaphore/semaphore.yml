@@ -65,14 +65,3 @@ blocks:
         always:
           commands:
             - test-results publish unit-tests.xml
-after_pipeline:
-  task:
-    jobs:
-      - name: "Merge Reports \U0001F4CA"
-        commands:
-          - test-results gen-pipeline-report
-promotions:
-  - name: Deploy to TestFlight
-    pipeline_file: testflight-deploy.yml
-    auto_promote:
-      when: branch = 'main' AND result = 'passed'

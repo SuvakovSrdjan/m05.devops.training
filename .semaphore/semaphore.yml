@@ -1,5 +1,5 @@
 version: v1.0
-name: "\U0001F34E Xcode CI Pipeline"
+name: Kubernetes Test
 agent:
   machine:
     type: a2-standard-4
@@ -12,14 +12,6 @@ auto_cancel:
     when: branch != 'main'
   queued:
     when: branch = 'main'
-global_job_config:
-  prologue:
-    commands:
-      - checkout
-      - brew install xcpretty
-      - gem install xcpretty-junit-formatter
-      - cache restore
-      - bundle install
 blocks:
   - name: Build and push Image
     dependencies: []

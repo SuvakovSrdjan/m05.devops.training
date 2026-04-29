@@ -26,29 +26,29 @@ blocks:
             - 'docker push $DOCKERHUB_USERNAME/my-flask-image:latest'
       secrets:
         - name: Srdjan_Docker
-  - name: Deploy to Blue
+  - name: Deploy Stable
     dependencies:
       - Build and push Image
     task:
       jobs:
-        - name: Deploy Blue to Kubernetes
+        - name: Deploy Stable to Kubernetes
           commands:
             - checkout
             - mkdir -p ~/.kube
             - 'wget https://gist.githubusercontent.com/TomFern/c6121c6d7fd72faeb5b7cf0ce5a0e002/raw/9e86a4ca3ac8c8df6aa34cc661f1410711aef8bd/config -O ~/.kube/config'
-            - cd 2-blue-green-deployment
+            - cd 3-canary-deployment
             - cat *service*.yml | grep 'nodePort'
             - kubectl create namespace "g1" || true
             - kubectl config set-context --current --namespace="g1"
-            - kubectl apply -f deployment-blue.yml
-            - kubectl apply -f service-blue.yml
-            - kubectl rollout status deployment/flask-app
+            - kubectl apply -f deployment-stable.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app-stable
       secrets:
         - name: Srdjan_Docker
         - name: kubeconfig
   - name: Verify
     dependencies:
-      - Deploy to Blue
+      - Deploy Stable
     task:
       jobs:
         - name: Run Unit Tests
@@ -63,5 +63,5 @@ after_pipeline:
       - name: 'Job #1'
         commands: []
 promotions:
-  - name: Deploy Green
+  - name: Deploy Canary
     pipeline_file: pipeline_2.yml

@@ -25,17 +25,33 @@ blocks:
     dependencies: []
     task:
       jobs:
-        - name: Install Dependencies
+        - name: Build docker image
           commands:
             - checkout
+            - cd 1-deployment
+            - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            - 'docker build -t $DOCKER_USERNAME/my-flask-image:latest .'
+            - 'docker push $DOCKER_USERNAME/my-flask-image:latest'
+      secrets:
+        - name: Srdjan_Docker
   - name: Deploy to Kubernetes
     dependencies:
       - Build and push Image
     task:
       jobs:
-        - name: SwiftLint
+        - name: Deploy to Kubernetes
           commands:
-            - echo hello
+            - checkout
+            - mkdir -p ~/.kube
+            - 'wget https://gist.githubusercontent.com/TomFern/c6121c6d7fd72faeb5b7cf0ce5a0e002/raw/9e86a4ca3ac8c8df6aa34cc661f1410711aef8bd/config -O ~/.kube/config'
+            - cd 1-deployment
+            - kubectl create namespace "g1" || true
+            - kubectl config set-context --current --namespace="gSrdjan"
+            - kubectl apply -f deployment.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app
+      secrets:
+        - name: Srdjan_Docker
   - name: Verify
     dependencies:
       - Deploy to Kubernetes
@@ -43,7 +59,8 @@ blocks:
       jobs:
         - name: Run Unit Tests
           commands:
-            - echo hello
+            - checkout
+            - kubectl get svc flask-app
       epilogue:
         always:
           commands:

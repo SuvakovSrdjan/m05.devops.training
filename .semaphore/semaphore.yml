@@ -20,7 +20,7 @@ blocks:
         - name: Build docker image
           commands:
             - checkout
-            - cd 2-blue-green-deployment
+            - cd 3-canary-deployment
             - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             - 'docker build -t $DOCKERHUB_USERNAME/my-flask-image:latest .'
             - 'docker push $DOCKERHUB_USERNAME/my-flask-image:latest'

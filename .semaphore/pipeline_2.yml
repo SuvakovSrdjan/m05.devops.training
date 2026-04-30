@@ -25,3 +25,5 @@ blocks:
           commands:
             - kubectl config set-context --current --namespace="g1"
             - kubectl get svc flask-app
+      secrets:
+        - name: kubeconfig
